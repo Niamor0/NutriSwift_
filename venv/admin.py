@@ -1,10 +1,8 @@
 from django.contrib import admin
-from django.contrib.redirects.models import Redirect
+from django.contrib.sites.models import Site
 
 
-@admin.register(Redirect)
-class RedirectAdmin(admin.ModelAdmin):
-    list_display = ("old_path", "new_path")
-    list_filter = ("site",)
-    search_fields = ("old_path", "new_path")
-    radio_fields = {"site": admin.VERTICAL}
+@admin.register(Site)
+class SiteAdmin(admin.ModelAdmin):
+    list_display = ("domain", "name")
+    search_fields = ("domain", "name")
