@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Contact Us - NutriSwift
+{% endblock %}
+
+{% block content %}
+<!-- Include FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="max-w-5xl max-lg:max-w-3xl mx-auto bg-white my-6 font-[sans-serif]">
+    <div class="text-center px-6">
+        <h2 class="text-gray-800 text-3xl font-extrabold">Contact Us</h2>
+        <p class="text-sm text-gray-500 mt-4">Have a question or feedback? We'd love to hear from you.</p>
+    </div>
+
+    {% if messages %}
+    <div class="px-6 mt-6">
+        {% for message in messages %}
+        <div class="{% if message.tags == 'success' %}bg-green-100 border-green-400 text-green-700{% else %}bg-red-100 border-red-400 text-red-700{% endif %} px-4 py-3 rounded relative border" role="alert">
+            <span class="block sm:inline">{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="grid lg:grid-cols-3 items-start gap-4 p-2 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] rounded-lg mt-12">
+        <div class="bg-[#011c2b] rounded-lg p-6 h-full max-lg:order-1">
+            <h2 class="text-xl text-white">Contact Information</h2>
+            <p class="text-sm text-gray-300 mt-4">Reach out to us with any questions you might have.</p>
+
+            <ul class="mt-16 space-y-8">
+                <li class="flex items-center">
+                    <i class="fas fa-envelope text-white w-4 h-4"></i>
+                    <a href="mailto:info@example.com" class="text-white text-sm text-gray-500 ml-4">
+                        info@example.com
+                    </a>
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-phone text-white w-4 h-4"></i>
+                    <a href="tel:+158996888" class="text-white text-sm text-gray-500 ml-4">
+                        +158 996 888
+                    </a>
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-map-marker-alt text-white w-4 h-4"></i>
+                    <a href="javascript:void(0)" class="text-white text-sm text-gray-500 ml-4">
+                        123 Street 256 House
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="flex flex-wrap gap-4 mt-16">
+                <li class="bg-gray-800 hover:bg-gray-900 h-10 w-10 rounded-full flex items-center justify-center shrink-0">
+                    <a href="javascript:void(0)">
+                        <i class="fab fa-facebook-f text-white"></i>
+                    </a>
+                </li>
+                <li class="bg-gray-800 hover:bg-gray-900 h-10 w-10 rounded-full flex items-center justify-center shrink-0">
+                    <a href="javascript:void(0)">
+                        <i class="fab fa-linkedin-in text-white"></i>
+                    </a>
+                </li>
+                <li class="bg-gray-800 hover:bg-gray-900 h-10 w-10 rounded-full flex items-center justify-center shrink-0">
+                    <a href="javascript:void(0)">
+                        <i class="fab fa-instagram text-white"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="p-4 lg:col-span-2">
+            <form method="POST" action="{% url 'contact' %}">
+                {% csrf_token %}
+                <div class="grid sm:grid-cols-2 gap-8">
+                    <div class="relative flex items-center">
+                        <input type="text" name="first_name" placeholder="First Name" required
+                            class="px-2 py-3 bg-white w-full text-sm text-gray-800 border-b border-gray-300 focus:border-blue-500 outline-none" />
+                        <i class="fas fa-user text-gray-400 absolute right-2"></i>
+                    </div>
+
+                    <div class="relative flex items-center">
+                        <input type="text" name="last_name" placeholder="Last Name" required
+                            class="px-2 py-3 bg-white w-full text-sm text-gray-800 border-b border-gray-300 focus:border-blue-500 outline-none" />
+                        <i class="fas fa-user text-gray-400 absolute right-2"></i>
+                    </div>
+
+                    <div class="relative flex items-center">
+                        <input type="tel" name="phone" placeholder="Phone No." required
+                            class="px-2 py-3 bg-white w-full text-sm text-gray-800 border-b border-gray-300 focus:border-blue-500 outline-none" />
+                        <i class="fas fa-phone text-gray-400 absolute right-2"></i>
+                    </div>
+
+                    <div class="relative flex items-center">
+                        <input type="email" name="email" placeholder="Email" required
+                            class="px-2 py-3 bg-white w-full text-sm text-gray-800 border-b border-gray-300 focus:border-blue-500 outline-none" />
+                        <i class="fas fa-envelope text-gray-400 absolute right-2"></i>
+                    </div>
+
+                    <div class="relative flex items-center sm:col-span-2">
+                        <textarea name="message" placeholder="Write Message" required rows="4"
+                            class="px-2 pt-3 bg-white w-full text-sm text-gray-800 border-b border-gray-300 focus:border-blue-500 outline-none"></textarea>
+                        <i class="fas fa-comment text-gray-400 absolute right-2 top-3"></i>
+                    </div>
+
+                    <div class="col-span-full">
+                        <h6 class="text-sm text-gray-800">Select Subject</h6>
+                        <div class="flex max-lg:flex-col gap-6 mt-4">
+                            <div class="flex items-center">
+                                <input id="radio1" type="radio" name="subject" value="General Inquiry" class="hidden peer" checked />
+                                <label for="radio1"
+                                    class="relative p-0.5 flex items-center justify-center shrink-0 peer-checked:before:hidden before:block before:absolute before:w-full before:h-full before:bg-white w-5 h-5 cursor-pointer border-2 border-[#011c2b] rounded-full overflow-hidden">
+                                    <span class="border-[4px] border-[#011c2b] rounded-full w-full h-full"></span>
+                                </label>
+                                <p class="text-sm text-gray-500 ml-4">General Inquiry</p>
+                            </div>
+
+                            <div class="flex items-center">
+                                <input id="radio2" type="radio" name="subject" value="Technical Support" class="hidden peer" />
+                                <label for="radio2"
+                                    class="relative p-0.5 flex items-center justify-center shrink-0 peer-checked:before:hidden before:block before:absolute before:w-full before:h-full before:bg-white w-5 h-5 cursor-pointer border-2 border-[#011c2b] rounded-full overflow-hidden">
+                                    <span class="border-[4px] border-[#011c2b] rounded-full w-full h-full"></span>
+                                </label>
+                                <p class="text-sm text-gray-500 ml-4">Technical Support</p>
+                            </div>
+
+                            <div class="flex items-center">
+                                <input id="radio3" type="radio" name="subject" value="Website Feedback" class="hidden peer" />
+                                <label for="radio3"
+                                    class="relative p-0.5 flex items-center justify-center shrink-0 peer-checked:before:hidden before:block before:absolute before:w-full before:h-full before:bg-white w-5 h-5 cursor-pointer border-2 border-[#011c2b] rounded-full overflow-hidden">
+                                    <span class="border-[4px] border-[#011c2b] rounded-full w-full h-full"></span>
+                                </label>
+                                <p class="text-sm text-gray-500 ml-4">Website Feedback</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit"
+                    class="mt-12 flex items-center justify-center text-sm lg:ml-auto max-lg:w-full rounded-lg px-4 py-3 tracking-wide text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300">
+                    <i class="fas fa-paper-plane mr-2"></i>
+                    Send Message
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

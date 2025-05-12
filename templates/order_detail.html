@@ -1,78 +1,227 @@
-{% extends 'admin/Sidebar.html' %}
+{% extends 'base.html' %}
 
-{% block title %}Admin - Order Detail{% endblock %}
+{% block title %}Order Detail{% endblock %}
 
 {% block content %}
-<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <!-- Main Content -->
-    <div class="max-w-4xl w-full space-y-8">
-        <!-- Order Information -->
-        <div class="bg-white shadow-lg overflow-hidden sm:rounded-lg mb-6 transform hover:scale-105 transition-transform duration-300">
-            <div class="px-4 py-5 sm:px-6 bg-gradient-to-r from-purple-500 to-indigo-600">
-                <h3 class="text-2xl leading-6 font-bold text-white">
-                    Order #{{ order.id }}
-                </h3>
-                <p class="mt-1 max-w-2xl text-sm text-purple-100">
-                    Placed on {{ order.created_at|date:"M d, Y" }}
-                </p>
+<!-- Include FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="min-h-screen bg-gray-50 py-12 px-6 sm:px-8 lg:px-12">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold text-center text-gray-800 mb-10">
+            <i class="fas fa-receipt text-blue-500 mr-2"></i>Order #{{ order.id }}
+        </h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Order Details -->
+            <div class="md:col-span-2">
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
+                        <i class="fas fa-shopping-cart text-blue-500 mr-2"></i>Order Items
+                    </h2>
+
+                    <div class="mt-6 space-y-4">
+                        {% for item in order_items %}
+                        <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                            <div class="flex items-center">
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="w-16 h-16 object-cover rounded-md mr-4">
+                                <div>
+                                    <h3 class="font-semibold">{{ item.product.name }}</h3>
+                                    <p class="text-sm text-gray-600">{{ item.item.product_type }}</p>
+                                    <p class="text-sm">Quantity: {{ item.item.quantity }}</p>
+                                </div>
+                            </div>
+                            <p class="font-semibold">৳ {{ item.subtotal }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <hr class="my-6">
+
+                    <div class="flex justify-between text-lg font-semibold">
+                        <span>Total Price:</span>
+                        <span>৳ {{ order.total_price }}</span>
+                    </div>
+
+                    <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <p class="text-gray-700 flex items-center">
+                                <i class="fas fa-money-bill-wave text-blue-500 mr-2"></i>
+                                <span>Payment Method:</span> 
+                                <span class="ml-2 font-medium">{{ order.payment_method }}</span>
+                            </p>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <p class="text-gray-700 flex items-center">
+                                <i class="fas fa-clock text-blue-500 mr-2"></i>
+                                <span>Order Date:</span>
+                                <span class="ml-2 font-medium">{{ order.created_at|date:"M d, Y" }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
+                        <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i>Delivery Information
+                    </h2>
+
+                    <div class="mt-4 space-y-2">
+                        <p class="text-gray-700">
+                            <span class="font-medium">Address:</span> {{ delivery.address }}
+                        </p>
+                        <p class="text-gray-700">
+                            <span class="font-medium">Contact:</span> {{ delivery.contact_number }}
+                        </p>
+                        {% if delivery.delivery_date %}
+                        <p class="text-gray-700">
+                            <span class="font-medium">Expected Delivery:</span> 
+                            {{ delivery.delivery_date|date:"M d, Y" }}
+                            {% if delivery.delivery_time %}
+                            at {{ delivery.delivery_time }}
+                            {% endif %}
+                        </p>
+                        {% endif %}
+                        {% if delivery.assigned_delivery_vendor %}
+                        <p class="text-gray-700">
+                            <span class="font-medium">Delivery Partner:</span> {{ delivery.assigned_delivery_vendor }}
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
-                <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
-                    <div class="sm:col-span-1">
-                        <dt class="text-sm font-medium text-gray-500">Customer Name</dt>
-                        <dd class="mt-1 text-lg font-semibold text-gray-900">{{ order.user.username }}</dd>
+
+            <!-- Order Tracking -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
+                    <i class="fas fa-truck text-blue-500 mr-2"></i>Order Tracking
+                </h2>
+
+                <div class="mt-6 relative">
+                    <div class="absolute left-5 top-0 h-full w-1 bg-gray-200"></div>
+                    
+                    <!-- Pending -->
+                    <div class="relative flex items-center mb-8">
+                        <div class="absolute left-5 -ml-3 h-6 w-6 rounded-full 
+                            {% if delivery.delivery_status == 'Pending' %}
+                                bg-blue-500 shadow-lg animate-pulse
+                            {% elif delivery.delivery_status == 'Assigned' or delivery.delivery_status == 'In_Transit' or delivery.delivery_status == 'Delivered' %}
+                                bg-green-500
+                            {% else %}
+                                bg-gray-300
+                            {% endif %}">
+                        </div>
+                        <div class="ml-10">
+                            <h3 class="text-lg font-semibold
+                                {% if delivery.delivery_status == 'Pending' %}text-blue-500
+                                {% elif delivery.delivery_status == 'Assigned' or delivery.delivery_status == 'In_Transit' or delivery.delivery_status == 'Delivered' %}text-green-500
+                                {% endif %}">
+                                <i class="fas fa-clipboard-list mr-2"></i>Order Placed
+                            </h3>
+                            <p class="text-sm text-gray-600">{{ order.created_at|date:"M d, Y" }}</p>
+                        </div>
                     </div>
-                    <div class="sm:col-span-1">
-                        <dt class="text-sm font-medium text-gray-500">Email</dt>
-                        <dd class="mt-1 text-lg font-semibold text-gray-900">{{ order.user.email }}</dd>
+                    
+                    <!-- Assigned -->
+                    <div class="relative flex items-center mb-8">
+                        <div class="absolute left-5 -ml-3 h-6 w-6 rounded-full 
+                            {% if delivery.delivery_status == 'Assigned' %}
+                                bg-blue-500 shadow-lg animate-pulse
+                            {% elif delivery.delivery_status == 'In_Transit' or delivery.delivery_status == 'Delivered' %}
+                                bg-green-500
+                            {% else %}
+                                bg-gray-300
+                            {% endif %}">
+                        </div>
+                        <div class="ml-10">
+                            <h3 class="text-lg font-semibold
+                                {% if delivery.delivery_status == 'Assigned' %}text-blue-500
+                                {% elif delivery.delivery_status == 'In_Transit' or delivery.delivery_status == 'Delivered' %}text-green-500
+                                {% endif %}">
+                                <i class="fas fa-user-check mr-2"></i>Assigned to Delivery Partner
+                            </h3>
+                            {% if delivery.assigned_delivery_vendor %}
+                            <p class="text-sm text-gray-600">{{ delivery.assigned_delivery_vendor }}</p>
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="sm:col-span-1">
-                        <dt class="text-sm font-medium text-gray-500">Phone</dt>
-                        <dd class="mt-1 text-lg font-semibold text-gray-900">{{ order.user.userprofile.phone }}</dd>
+                    
+                    <!-- In Transit -->
+                    <div class="relative flex items-center mb-8">
+                        <div class="absolute left-5 -ml-3 h-6 w-6 rounded-full 
+                            {% if delivery.delivery_status == 'In_Transit' %}
+                                bg-blue-500 shadow-lg animate-pulse
+                            {% elif delivery.delivery_status == 'Delivered' %}
+                                bg-green-500
+                            {% else %}
+                                bg-gray-300
+                            {% endif %}">
+                        </div>
+                        <div class="ml-10">
+                            <h3 class="text-lg font-semibold
+                                {% if delivery.delivery_status == 'In_Transit' %}text-blue-500
+                                {% elif delivery.delivery_status == 'Delivered' %}text-green-500
+                                {% endif %}">
+                                <i class="fas fa-truck mr-2"></i>In Transit
+                            </h3>
+                            <p class="text-sm text-gray-600">Your order is on the way</p>
+                        </div>
                     </div>
-                    <div class="sm:col-span-1">
-                        <dt class="text-sm font-medium text-gray-500">Total Amount</dt>
-                        <dd class="mt-1 text-2xl font-bold text-green-600">BDT {{ order.total_price }}</dd>
+                    
+                    <!-- Delivered -->
+                    <div class="relative flex items-center">
+                        <div class="absolute left-5 -ml-3 h-6 w-6 rounded-full 
+                            {% if delivery.delivery_status == 'Delivered' %}
+                                bg-green-500
+                            {% else %}
+                                bg-gray-300
+                            {% endif %}">
+                        </div>
+                        <div class="ml-10">
+                            <h3 class="text-lg font-semibold
+                                {% if delivery.delivery_status == 'Delivered' %}text-green-500{% endif %}">
+                                <i class="fas fa-check-circle mr-2"></i>Delivered
+                            </h3>
+                            <p class="text-sm text-gray-600">
+                                {% if delivery.delivery_status == 'Delivered' %}
+                                Delivered on {{ delivery.delivery_date|date:"M d, Y" }}
+                                {% else %}
+                                Estimated delivery date: {{ delivery.delivery_date|default:"Pending" }}
+                                {% endif %}
+                            </p>
+                        </div>
                     </div>
-                    <div class="sm:col-span-2">
-                        <dt class="text-sm font-medium text-gray-500">Delivery Address</dt>
-                        <dd class="mt-1 text-lg font-semibold text-gray-900">{{ order.delivery.address }}</dd>
-                    </div>
-                </dl>
+                </div>
+
+                <!-- Order Status -->
+                <div class="mt-8 bg-blue-50 p-4 rounded-lg">
+                    <h3 class="font-semibold flex items-center">
+                        <i class="fas fa-info-circle text-blue-500 mr-2"></i>Order Status
+                    </h3>
+                    <p class="mt-1">
+                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if order.status == 'Delivered' %}bg-green-100 text-green-800
+                            {% elif order.status == 'Pending' or order.status == 'Payment_Pending' %}bg-yellow-100 text-yellow-800
+                            {% elif order.status == 'Cancelled' %}bg-red-100 text-red-800
+                            {% else %}bg-blue-100 text-blue-800{% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </p>
+                </div>
             </div>
         </div>
 
-        <!-- Order Status Update -->
-        <div class="bg-white shadow-lg overflow-hidden sm:rounded-lg mb-6 transform hover:scale-105 transition-transform duration-300">
-            <div class="px-4 py-5 sm:px-6 bg-gradient-to-r from-yellow-400 to-orange-500">
-                <h3 class="text-2xl leading-6 font-bold text-white">Order Status</h3>
-                <form method="POST" action="{% url 'update_order_status' order.id %}" class="mt-4 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                    {% csrf_token %}
-                    <select name="status" class="flex-grow rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-lg">
-                        {% for status in order.STATUS_CHOICES %}
-                        <option value="{{ status.0 }}" {% if order.status == status.0 %}selected{% endif %}>
-                            {{ status.1 }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                    <button type="submit" class="inline-flex items-center px-6 py-3 border border-transparent text-lg font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-300">
-                        Update Status
-                    </button>
-                </form>
-            </div>
+        <div class="mt-8 text-center">
+            <a href="{% url 'order_history' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Orders
+            </a>
+            
+            {% if order.status == 'Payment_Pending' or order.status == 'Pending' %}
+            <a href="{% url 'cancel_order' order.id %}" class="ml-4 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700">
+                <i class="fas fa-times mr-2"></i> Cancel Order
+            </a>
+            {% endif %}
         </div>
     </div>
 </div>
-
-<script>
-    const form = document.querySelector('form');
-    const button = form.querySelector('button');
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        button.classList.add('animate-pulse');
-        setTimeout(() => {
-            form.submit();
-        }, 500);
-    });
-</script>
 {% endblock %}
