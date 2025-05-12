@@ -1,29 +1,15 @@
-from django.core.exceptions import ValidationError
-from django.utils.functional import SimpleLazyObject
-from django.utils.text import format_lazy
+from django.middleware.csrf import get_token
+from django.utils.functional import lazy
+from django.utils.html import format_html
+from django.utils.safestring import SafeString
 
 
-def prefix_validation_error(error, prefix, code, params):
-    """
-    Prefix a validation error message while maintaining the existing
-    validation data structure.
-    """
-    if error.error_list == [error]:
-        error_params = error.params or {}
-        return ValidationError(
-            # We can't simply concatenate messages since they might require
-            # their associated parameters to be expressed correctly which
-            # is not something `format_lazy` does. For example, proxied
-            # ngettext calls require a count parameter and are converted
-            # to an empty string if they are missing it.
-            message=format_lazy(
-                "{} {}",
-                SimpleLazyObject(lambda: prefix % params),
-                SimpleLazyObject(lambda: error.message % error_params),
-            ),
-            code=code,
-            params={**error_params, **params},
-        )
-    return ValidationError(
-        [prefix_validation_error(e, prefix, code, params) for e in error.error_list]
+def csrf_input(request):
+    return format_html(
+        '<input type="hidden" name="csrfmiddlewaretoken" value="{}">',
+        get_token(request),
     )
+
+
+csrf_input_lazy = lazy(csrf_input, SafeString, str)
+csrf_token_lazy = lazy(get_token, str)
