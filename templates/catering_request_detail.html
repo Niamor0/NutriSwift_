@@ -1,0 +1,30 @@
+{% extends 'admin/Sidebar.html' %}
+
+{% block title %}Catering Request Detail{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-12 px-6 sm:px-8 lg:px-12">
+    <h1 class="text-4xl font-bold text-center text-gray-800 mb-10">Catering Request #{{ catering_request.id }}</h1>
+
+    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Request Details</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+                <p class="text-gray-500"><span class="font-semibold text-gray-800">User:</span> {{ catering_request.user.username }}</p>
+                <p class="text-gray-500"><span class="font-semibold text-gray-800">Event Type:</span> {{ catering_request.event_type }}</p>
+                <p class="text-gray-500"><span class="font-semibold text-gray-800">Event Date:</span> {{ catering_request.event_date|date:"M d, Y" }}</p>
+                <p class="text-gray-500"><span class="font-semibold text-gray-800">Number of Guests:</span> {{ catering_request.number_of_guests }}</p>
+            </div>
+            <div>
+                <p class="text-gray-500"><span class="font-semibold text-gray-800">Location:</span> {{ catering_request.location }}</p>
+                <p class="text-gray-500"><span class="font-semibold text-gray-800">Menu Items:</span> {{ catering_request.menu_items }}</p>
+                <p class="text-gray-500"><span class="font-semibold text-gray-800">Special Requests:</span> {{ catering_request.special_requests|default:"None" }}</p>
+                <p class="text-gray-500"><span class="font-semibold text-gray-800">Status:</span> {{ catering_request.status }}</p>
+            </div>
+        </div>
+        <div class="mt-6 text-right">
+            <a href="{% url 'catering_management' %}" class="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300">Back to Requests</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
